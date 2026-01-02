@@ -1,0 +1,39 @@
+---
+title: "R Visualization 1"
+author: "Tangkwa Siwanuch S"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r message=FALSE, warning=FALSE}
+# Install and load library
+install.packages("tidyverse")
+install.packages("ggrepel")
+
+library(tidyverse)
+library(ggrepel)
+
+# Read data from csv file
+coffee <- read_csv("coffeeByCountry.csv")
+
+# Data Overview
+summary(coffee)
+glimpse(coffee)
+
+# Use ggplot: visualize with Scatter plot
+ggplot(data = coffee,
+       mapping = aes(x=AVG_Aroma, y=AVG_Flavor,
+                     color=Country.of.Origin,
+                     label = coffee$Country.of.Origin)) +
+  geom_point() +
+  geom_text_repel(max.overlaps = 15) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(title = "Coffee Aroma vs. Flavor (by Country)",
+       x = "Average Aroma",
+       y = "Average Flavor")
+
+```
+
