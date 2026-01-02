@@ -1,0 +1,85 @@
+---
+title: "R Visualization 2"
+author: "Tangkwa Siwanuch S"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r message=FALSE, warning=FALSE}
+# Install and load library
+#install.packages("tidyverse")
+#install.packages("ggrepel")
+
+library(tidyverse)
+library(ggrepel)
+
+# Read data from csv file
+netusage <- read_csv("InternetUsage.csv")
+
+# Data Overview
+glimpse(netusage)
+str(netusage)
+
+## Visualization No. 1
+
+# Distinct value of daily_role
+netusage %>%
+  count(daily_role)
+
+# Transform daily_role to shorter name
+netusage %>%
+  mutate(daily_role_short = case_when(
+    daily_role == "Caregiver/Home" ~ "Caregiver",
+    daily_role == "Full-time Employee" ~ "Full-time",
+    daily_role == "Part-time/Shift" ~ "Part-time",
+    daily_role == "Unemployed_Looking" ~ "Unemployed",
+    TRUE ~ daily_role
+  )) %>%
+
+# Use ggplot: scatter plots of 2 continuous variables, multiple plots by 2 discrete variables
+  
+ggplot(data = . ,
+       mapping = aes(x=digital_dependence_score, y=anxiety_score)) +
+  geom_point(size=1.5, alpha=0.8) +
+  geom_smooth() +
+  facet_grid(daily_role_short ~ region) +
+  theme_minimal() +
+  theme(
+  strip.text.y = element_text(size = 6)) +
+  labs(title = "Digital Dependence vs. Anxiety Level by Employment Type",
+       x = "Digital Dependence Score",
+       y = "Anxiety Score")
+
+## Visualization No. 2
+
+# Transform age column from continuous to discrete
+netusage %>%
+  mutate(age_range = case_when(
+    age<= 10  ~ "1_10",
+    age<=20 ~ "11_20",
+    age<=30 ~ "21_30",
+    age<=40 ~ "31_40",
+    age<=50 ~ "41_50",
+    TRUE ~ "51_more"
+  )) %>% 
+  mutate(region_2 = case_when(
+    region == "North America"  ~ "North\nAmerica",
+    region == "South America"  ~ "South\nAmerica",
+    region == "Middle East"  ~ "Middle\nEast",
+    TRUE ~ region
+  )) %>% 
+# Use ggplot: box plots of 1 continuous variable by 2 discrete variables
+ggplot(data = .,
+       mapping = aes(x=region_2, y=digital_dependence_score)) +
+  geom_boxplot() +
+  facet_wrap(~age_range) +
+  theme_minimal() +
+  theme(
+  strip.text.y = element_text(size = 6)) +
+  labs(title = "Digital Dependence vs. Age By Region",
+       x = "Age",
+       y = "Digital Dependence Score")
+
+```
